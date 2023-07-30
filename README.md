@@ -1,10 +1,12 @@
 ## Run RLHF on our tencent cloud server
 The repo is rebased from https://github.com/lvwerra/trl/blob/main/examples/scripts/sentiment_tuning
 
-But I pre-downloaded all model and datasets to make it ready to run.
+But I pre-downloaded all model and datasets on our server to make it ready to run.
 
 Also add some comments for easier understanding.
 
+### Step-0
+Read the task at https://huggingface.co/lvwerra/gpt2-imdb-pos
 
 ### Step-1
 ``python step_1_sft.py``
