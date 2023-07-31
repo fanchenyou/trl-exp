@@ -26,7 +26,7 @@ class ScriptArguments:
     dataset_text_field: Optional[str] = field(default="text", metadata={"help": "the text field of the dataset"})
     log_with: Optional[str] = field(default='tensorboard', metadata={"help": "use 'wandb' to log with wandb"})
     learning_rate: Optional[float] = field(default=1.41e-5, metadata={"help": "the learning rate"})
-    batch_size: Optional[int] = field(default=32, metadata={"help": "the batch size"})
+    batch_size: Optional[int] = field(default=16, metadata={"help": "the batch size"})
     seq_length: Optional[int] = field(default=384, metadata={"help": "Input sequence length"})
     gradient_accumulation_steps: Optional[int] = field(
         default=2, metadata={"help": "the number of gradient accumulation steps"}
@@ -44,20 +44,6 @@ parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
 
 # Step 1: Load the model
-if script_args.load_in_8bit and script_args.load_in_4bit:
-    raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
-elif script_args.load_in_8bit or script_args.load_in_4bit:
-    quantization_config = BitsAndBytesConfig(
-        load_in_8bit=script_args.load_in_8bit, load_in_4bit=script_args.load_in_4bit
-    )
-    # This means: fit the entire model on the GPU:0
-    device_map = {"": 0}
-    torch_dtype = torch.bfloat16
-else:
-    device_map = None
-    quantization_config = None
-    torch_dtype = torch.half
-
 # load model from /data/LLM_MODEL/opt-350m
 tokenizer = AutoTokenizer.from_pretrained(
     pretrained_model_name_or_path=script_args.model_name,
@@ -69,10 +55,9 @@ torch.backends.cuda.enable_flash_sdp(True)
 
 model = AutoModelForCausalLM.from_pretrained(
     script_args.model_name,
-    quantization_config=quantization_config,
-    device_map=device_map,
+    device_map=None,
     trust_remote_code=script_args.trust_remote_code,
-    torch_dtype=torch_dtype,
+    torch_dtype=torch.half,
     use_auth_token=script_args.use_auth_token,
 )
 
@@ -103,14 +88,15 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
     logging_steps=script_args.logging_steps,
-    save_steps = 2000, # save every 500 iters
+    save_steps = 500, # save every 500 iters
     save_total_limit = 3, # only save most recent 3 checkpoints, to avoid exceeding disk
+    num_train_epochs = 10
 )
 
 # Step 4: Define the Trainer
 trainer = SFTTrainer(
     model=model,
-    #tokenizer=tokenizer,
+    tokenizer=tokenizer,
     args=training_args,
     train_dataset=dataset,
     dataset_text_field=script_args.dataset_text_field,

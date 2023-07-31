@@ -44,26 +44,10 @@ parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
 
 # Step 1: Load the model
-if script_args.load_in_8bit and script_args.load_in_4bit:
-    raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
-elif script_args.load_in_8bit or script_args.load_in_4bit:
-    quantization_config = BitsAndBytesConfig(
-        load_in_8bit=script_args.load_in_8bit, load_in_4bit=script_args.load_in_4bit
-    )
-    # This means: fit the entire model on the GPU:0
-    device_map = {"": 0}
-else:
-    device_map = None
-    quantization_config = None
-    torch_dtype = torch.half
-
-
 model = AutoModelForSequenceClassification.from_pretrained(
     script_args.model_name, # "/data/LLM_MODEL/opt-350m",
-    quantization_config=quantization_config,
-    device_map=device_map,
     trust_remote_code=script_args.trust_remote_code,
-    torch_dtype=torch_dtype,
+    torch_dtype=torch.half
 )
 # print(model)
 # exit()
@@ -125,7 +109,9 @@ training_args = TrainingArguments(
     per_device_train_batch_size=script_args.batch_size,
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
-    save_steps = 2000, # save every 500 iters
+    save_steps = 1000, # save every 500 iters
+    save_total_limit = 3, # only save most recent 3 checkpoints, to avoid exceeding disk
+    num_train_epochs = 10
 )
 
 

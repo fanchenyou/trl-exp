@@ -12,24 +12,37 @@ Print them and show.
 3. What are the SFT_Trainer, Reward_Trainer, PPO_Trainer working in details? Find out the loss functions. 
 4. Visualize the training process with ***tensorboard***. In VSCode, open the command palette (Ctrl/Cmd + Shift + P) , search for the command “Python: Launch TensorBoard” and press enter. 
 
-### Step-0 Task Understanding: generating positive movie reviews
+### Step 0: Task Understanding: generating positive movie reviews
 Read the task at https://huggingface.co/lvwerra/gpt2-imdb-pos
 
-### Step-1 Supervised fine-tuning on IMDB movie data
+### Step 1: Supervised fine-tuning on IMDB movie data
 ``python step_1_sft.py``
 
 Check output at output/sft_1, will be used in step-3.
 
 
 
-### Step-2 Reward modeling as sentimental classification of a movie review
+### Step 2: Reward modeling as sentimental classification of a movie review
 ``python step_2_reward.py``
 
 Check output at output/rm_2, will be used in step-3.
 
 
-### Step-3 RL to encourages a model to generate only positive review 
-``python step_3_ppo.py``
+### Step 3: RL to encourages a model to generate only positive review 
+First you can use online model to try this step, run
+``python step_3_ppo_use_online_model.py``
 
-Use model saved in Step-1 and Step-2 for RL fine-tuning.
+Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
+ 1. Modify ``step_3_ppo.py`` with your model checkpoint number, as
+
+    ```
+    model_name: Optional[str] = field(default="output/sft_1/checkpoint-50000", metadata={"help": "the model name"})
+
+    ref_model_name: Optional[str] = field(default="output/rm_2/checkpoint-10500", metadata={"help": "the model name"})
+    ```
+    change the checkpoint-XXXXX with your model checkpoint number
+
+
+ 2. Run ``python step_3_ppo.py``
+
 
