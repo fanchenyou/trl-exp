@@ -26,7 +26,7 @@ class ScriptArguments:
     dataset_text_field: Optional[str] = field(default="text", metadata={"help": "the text field of the dataset"})
     log_with: Optional[str] = field(default='tensorboard', metadata={"help": "use 'wandb' to log with wandb"})
     learning_rate: Optional[float] = field(default=1.41e-5, metadata={"help": "the learning rate"})
-    batch_size: Optional[int] = field(default=8, metadata={"help": "the batch size"})
+    batch_size: Optional[int] = field(default=32, metadata={"help": "the batch size"})
     seq_length: Optional[int] = field(default=384, metadata={"help": "Input sequence length"})
     gradient_accumulation_steps: Optional[int] = field(
         default=2, metadata={"help": "the number of gradient accumulation steps"}
@@ -103,7 +103,8 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
     logging_steps=script_args.logging_steps,
-    save_steps = 1000, # save every 500 iters
+    save_steps = 2000, # save every 500 iters
+    save_total_limit = 3, # only save most recent 3 checkpoints, to avoid exceeding disk
 )
 
 # Step 4: Define the Trainer

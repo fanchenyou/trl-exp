@@ -125,7 +125,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=script_args.batch_size,
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
-    save_steps = 1000, # save every 500 iters
+    save_steps = 2000, # save every 500 iters
 )
 
 
