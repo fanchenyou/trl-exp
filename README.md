@@ -49,14 +49,14 @@ Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
  3. The tensorboard should record learning stats.
 
 
-      ![ppo-visualize](./pics/ppo_1.jpg "ppo-1") 
+      ![ppo-visualize](pics/ppo_1.jpg "ppo-1") 
 
       1) The reward is increasing as the model learns to generate positive reviews, i.e., positive scores, as shown in Figure above titled "env/reward_mean".
       2) The KL-div increases, as shown in Figure above "objective/kl".
       as the trained model and the fixed reference model (see code ref_model) gets more and more different with the training proceeds. Initially, model and ref_model are the same. 
 
 
-      ![ppo-visualize](./pics/ppo_2.jpg "ppo-2")
+      ![ppo-visualize](pics/ppo_2.jpg "ppo-2")
 
       3) Question: what is policy and loss in Figure above ?
       4) Question: what is advantage in Figure above "ppo/policy/advantage_mean" ? 
