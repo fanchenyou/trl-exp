@@ -20,14 +20,13 @@ class ScriptArguments:
     """
 
     model_name: Optional[str] = field(
-        default="output/sft_1/checkpoint-500", metadata={"help": "the model name"})
-    # reward_model_name: Optional[str] = field(
-    #     default="output/rm_2/checkpoint-10000", metadata={"help": "the model name"})
-    # model_name: Optional[str] = field(default="/data/LLM_MODEL/gpt2-imdb", metadata={"help": "the model name"})
-    # model_name: Optional[str] = field(default="/data/LLM_MODEL/opt-350m", metadata={"help": "the model name"})
-    
+        default="output/sft_1/checkpoint-3500", metadata={"help": "the model name"})
+    # model_name: Optional[str] = field(
+    #     default="/data/LLM_MODEL/gpt2-imdb", metadata={"help": "the model name"})
     reward_model_name: Optional[str] = field(
-        default="lvwerra/distilbert-imdb", metadata={"help": "the model name"})
+         default="output/rm_2/checkpoint-5000", metadata={"help": "the model name"})
+    # reward_model_name: Optional[str] = field(
+    #     default="lvwerra/distilbert-imdb", metadata={"help": "the model name"})
     log_with: Optional[str] = field(default='tensorboard', metadata={
                                     "help": "use 'wandb' to log with wandb"})
     learning_rate: Optional[float] = field(
@@ -79,7 +78,7 @@ config = PPOConfig(
 )
 
 torch.backends.cuda.enable_flash_sdp(True)
-
+torch.set_float32_matmul_precision("medium")
 # We then define the arguments to pass to the sentiment analysis pipeline.
 # We set `return_all_scores` to True to get the sentiment score for each token.
 sent_kwargs = {"return_all_scores": True,
@@ -113,12 +112,12 @@ def build_dataset(config, dataset_name="imdb", input_min_text_length=6, input_ma
     # load imdb with datasets
     ds = load_dataset(dataset_name, split="train")
     ds = ds.rename_columns({"text": "review"})
-    ds = ds.filter(lambda x: len(x["review"]) > 500, batched=False)
+    ds = ds.filter(lambda x: len(x["review"]) > 200, batched=False)
 
     input_size = LengthSampler(input_min_text_length, input_max_text_length)
 
     def tokenize(sample):
-        sample["input_ids"] = tokenizer(
+        sample["input_ids"] = tokenizer.encode(
             sample["review"])[: input_size()]
         sample["query"] = tokenizer.decode(sample["input_ids"])
         return sample
@@ -215,8 +214,9 @@ for epoch, batch in enumerate(ppo_trainer.dataloader):
 
     pipe_outputs = sentiment_pipe(texts, **sent_kwargs)
     assert len(pipe_outputs) == script_args.batch_size
-    # print(pipe_outputs[0])
-    rewards = [torch.tensor(output[1]["score"]) for output in pipe_outputs]
+    # print(pipe_outputs)
+    
+    rewards = [torch.tensor(output[0]["score"]) for output in pipe_outputs]
     # print(rewards)
 
 

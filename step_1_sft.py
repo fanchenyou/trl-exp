@@ -21,15 +21,15 @@ class ScriptArguments:
 
     model_name: Optional[str] = field(default="/data/LLM_MODEL/opt-350m", metadata={"help": "the model name"})
     dataset_name: Optional[str] = field(
-        default="/data/LLM_MODEL/imdb", metadata={"help": "the dataset name"}
+        default="imdb", metadata={"help": "the dataset name"}
     )
     dataset_text_field: Optional[str] = field(default="text", metadata={"help": "the text field of the dataset"})
     log_with: Optional[str] = field(default='tensorboard', metadata={"help": "use 'wandb' to log with wandb"})
     learning_rate: Optional[float] = field(default=1.41e-5, metadata={"help": "the learning rate"})
-    batch_size: Optional[int] = field(default=16, metadata={"help": "the batch size"})
+    batch_size: Optional[int] = field(default=8, metadata={"help": "the batch size"})
     seq_length: Optional[int] = field(default=384, metadata={"help": "Input sequence length"})
     gradient_accumulation_steps: Optional[int] = field(
-        default=2, metadata={"help": "the number of gradient accumulation steps"}
+        default=8, metadata={"help": "the number of gradient accumulation steps"}
     )
     load_in_8bit: Optional[bool] = field(default=False, metadata={"help": "load the model in 8 bits precision"})
     load_in_4bit: Optional[bool] = field(default=False, metadata={"help": "load the model in 4 bits precision"})
@@ -42,13 +42,13 @@ class ScriptArguments:
 
 parser = HfArgumentParser(ScriptArguments)
 script_args = parser.parse_args_into_dataclasses()[0]
-
+ 
 # Step 1: Load the model
-# load model from /data/LLM_MODEL/opt-350m
-tokenizer = AutoTokenizer.from_pretrained(
-    pretrained_model_name_or_path=script_args.model_name,
-)
-print(tokenizer)
+# load model from /data/LLM_MODEL/opt-350m∏
+# tokenizer = AutoTokenizer.from_pretrained(
+#     pretrained_model_name_or_path=script_args.model_name,
+# )
+# print(tokenizer)
 
 # use flash attention
 torch.backends.cuda.enable_flash_sdp(True)
@@ -57,7 +57,7 @@ model = AutoModelForCausalLM.from_pretrained(
     script_args.model_name,
     device_map=None,
     trust_remote_code=script_args.trust_remote_code,
-    torch_dtype=torch.half,
+    torch_dtype=None,
     use_auth_token=script_args.use_auth_token,
 )
 
@@ -72,7 +72,7 @@ dataset = load_dataset(path=script_args.dataset_name, split="train")
 #     num_rows: 25000
 # })
 
-max_seq_length = 384 #script_args.seq_length
+# max_seq_length = 384 #script_args.seq_length
 dataset_text_field = "text" 
 
 # visualize the data
@@ -87,20 +87,21 @@ training_args = TrainingArguments(
     per_device_train_batch_size=script_args.batch_size,
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     learning_rate=script_args.learning_rate,
+    report_to='tensorboard',
     logging_steps=script_args.logging_steps,
     save_steps = 500, # save every 500 iters
     save_total_limit = 3, # only save most recent 3 checkpoints, to avoid exceeding disk
-    num_train_epochs = 10
+    num_train_epochs = 10,
+    max_steps=-1,
 )
 
 # Step 4: Define the Trainer
 trainer = SFTTrainer(
     model=model,
-    tokenizer=tokenizer,
     args=training_args,
+    max_seq_length=script_args.seq_length,
     train_dataset=dataset,
-    dataset_text_field=script_args.dataset_text_field,
-    max_seq_length = max_seq_length
+    dataset_text_field=script_args.dataset_text_field
 )
 
 # Dataset({

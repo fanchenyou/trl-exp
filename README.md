@@ -28,7 +28,7 @@ Check output at output/sft_1, will be used in step-3.
 Check output at output/rm_2, will be used in step-3.
 
 
-### Step 3: RL to encourages a model to generate only positive review 
+### Step 3: RL encourages a model to generate only positive review 
 First you can use online model to try this step, run
 ``python step_3_ppo_use_online_model.py``
 
@@ -36,9 +36,9 @@ Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
  1. Modify ``step_3_ppo.py`` with your model checkpoint number, as
 
     ```
-    model_name: Optional[str] = field(default="output/sft_1/checkpoint-50000", metadata={"help": "the model name"})
-
-    ref_model_name: Optional[str] = field(default="output/rm_2/checkpoint-10500", metadata={"help": "the model name"})
+    model_name: Optional[str] = field(default="output/sft_1/checkpoint-10000", metadata={"help": "the model name"})
+    
+    ref_model_name: Optional[str] = field(default="output/rm_2/checkpoint-10000", metadata={"help": "the model name"})
     ```
     change the checkpoint-XXXXX with your model checkpoint number
 

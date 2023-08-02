@@ -19,7 +19,7 @@ class ScriptArguments:
     """
 
     model_name: Optional[str] = field(default="/data/LLM_MODEL/gpt2-imdb", metadata={"help": "the model name"})
-    log_with: Optional[str] = field(default=None, metadata={"help": "use 'wandb' to log with wandb"})
+    log_with: Optional[str] = field(default='tensorboard', metadata={"help": "use 'wandb' to log with wandb"})
     learning_rate: Optional[float] = field(default=1.41e-5, metadata={"help": "the learning rate"})
     mini_batch_size: Optional[int] = field(default=128, metadata={"help": "the PPO minibatch size"})
     batch_size: Optional[int] = field(default=128, metadata={"help": "the batch size"})
@@ -38,7 +38,7 @@ class ScriptArguments:
     )
     target_kl: Optional[float] = field(default=0.1, metadata={"help": "kl target for early stopping"})
     seed: Optional[int] = field(default=0, metadata={"help": "the random seed"})
-    output_dir: Optional[str] = field(default="output/ppo_3", metadata={"help": "the output directory"})
+    output_dir: Optional[str] = field(default="output/ppo_3_online", metadata={"help": "the output directory"})
     
 
 parser = HfArgumentParser(ScriptArguments)
@@ -59,6 +59,7 @@ config = PPOConfig(
 )
 
 torch.backends.cuda.enable_flash_sdp(True)
+torch.set_float32_matmul_precision("medium")
 
 # We then define the arguments to pass to the sentiment analysis pipeline.
 # We set `return_all_scores` to True to get the sentiment score for each token.
@@ -90,7 +91,7 @@ def build_dataset(config, dataset_name="imdb", input_min_text_length=6, input_ma
     # load imdb with datasets
     ds = load_dataset(dataset_name, split="train")
     ds = ds.rename_columns({"text": "review"})
-    ds = ds.filter(lambda x: len(x["review"]) > 500, batched=False)
+    ds = ds.filter(lambda x: len(x["review"]) > 200, batched=False)
 
     input_size = LengthSampler(input_min_text_length, input_max_text_length)
 
