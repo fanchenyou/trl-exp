@@ -58,8 +58,8 @@ Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
 
       ![ppo-visualize](pics/ppo_2.jpg "ppo-2")
 
-      3) Question: what is policy and loss in Figure above ?
-      4) Question: what is advantage in Figure above "ppo/policy/advantage_mean" ? 
+      3) Question: what are the policy and loss in Figure above ?
+      4) Question: what is advantage in Figure above "ppo/policy/advantage_mean" ?
 
 
 
