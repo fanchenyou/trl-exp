@@ -57,23 +57,27 @@ Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
 
 
       ![ppo-visualize](assets/ppo_2.jpg "ppo-2")
+
       3) Question: what is policy and loss in Figure above ?
       4) Question: what is advantage in Figure above "ppo/policy/advantage_mean" ? 
 
 
-    TIPS: If VSCode cannot open tensorboard, e.g., error: launching timeout, you can manually start tensorboard like this:
-    ```
-      本地终端登陆远程服务器
+
+
+
+#### TIPS: 
+   If VSCode cannot open tensorboard, e.g., error: launching timeout, you can manually start tensorboard like this:
+   
+      ```
+      本地终端登陆远程服务器, USER是你的用户名
       ssh -L 10086:127.0.0.1:8080 USER@49.233.53.224
 
-      远程服务器中找到tensorboard所在目录并运行
+      远程服务器中找到你的目录并运行tensorboard
       cd PATH/trl-exp
       conda activate YOUR-ENV-NAME
       tensorboard --logdir ./output --port 8080
 
       在本地浏览器中输入如下地址即可查看tensorboard结果
       http://127.0.0.1:10086
-
-
-    ```
+      ```
 
