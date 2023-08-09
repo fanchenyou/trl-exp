@@ -63,7 +63,15 @@ Then, you can use model saved in Step-1 and Step-2 for RL fine-tuning.
 
 
 
+### Step 4: Reject sampling inspired by LLAMA-2
+This is a naive implementation inspired by LLAMA-2 [[paper]](https://arxiv.org/pdf/2307.09288.pdf).
+It uses a reference model for generating K samples, then uses a reward model to score each sample.
+It selects the top score sample for training the real model.  See the description in paper.
 
+   ![rejection-sampling](pics/rejection_sampling.png "rs") 
+
+   Run ``python step_3_ppo.py``
+   Use ``tensorboard --logdir ./output/rs_4`` to visualize result.
 
 #### TIPS: 
    If VSCode cannot open tensorboard, e.g., error: launching timeout, you can manually start tensorboard like this:
