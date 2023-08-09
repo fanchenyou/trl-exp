@@ -70,8 +70,14 @@ It selects the top score sample for training the real model.  See the descriptio
 
    ![rejection-sampling](pics/rejection_sampling.png "rs") 
 
-   Run ``python step_3_ppo.py``
-   Use ``tensorboard --logdir ./output/rs_4`` to visualize result.
+   To run this code
+   1. update your trl/trainer/sft_trainer.py with https://github.com/fanchenyou/trl-exp/blob/main/trl/trainer/sft_trainer.py
+   
+   2. Download step_4_reject_sampling.py
+
+   3. Run ``python step_4_reject_sampling.py``, which is slow due to inefficient implementation.
+
+   4. Use ``tensorboard --logdir ./output/rs_4`` to visualize result.
 
 #### TIPS: 
    If VSCode cannot open tensorboard, e.g., error: launching timeout, you can manually start tensorboard like this:
